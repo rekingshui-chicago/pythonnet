@@ -43,6 +43,7 @@
   <PropertyGroup>
     <OutputPath>..\..\pythonnet\runtime</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Version>3.1.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
