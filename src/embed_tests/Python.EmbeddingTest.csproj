@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\runtime\Python.Runtime.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="fixtures/**/*.py" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
@@ -30,6 +26,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\runtime\Python.Runtime.csproj" />
   </ItemGroup>
 
 </Project>

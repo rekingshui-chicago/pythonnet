@@ -8,8 +8,7 @@ namespace Python.Runtime
     /// <summary>
     /// Represents a reference to a Python object, that is tracked by Python's reference counting.
     /// </summary>
-    [NonCopyable]
-    ref struct NewReference
+    public ref struct NewReference
     {
         IntPtr pointer;
 
@@ -142,7 +141,7 @@ namespace Python.Runtime
     /// because <c>this</c> is always passed by value, which we need to avoid.
     /// (note <code>this in NewReference</code> vs the usual <code>this NewReference</code>)
     /// </summary>
-    static class NewReferenceExtensions
+    public static class NewReferenceExtensions
     {
         /// <summary>Gets a raw pointer to the Python object</summary>
         [Pure]
@@ -153,8 +152,7 @@ namespace Python.Runtime
         [DebuggerHidden]
         public static bool IsNull(this in NewReference reference)
             => NewReference.IsNull(reference);
-
-
+    
         [Pure]
         [DebuggerHidden]
         public static BorrowedReference BorrowNullable(this in NewReference reference)

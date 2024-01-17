@@ -1261,6 +1261,10 @@ namespace Python.Runtime
                 );
         }
 
+        public static NewReference Public_PyString_FromString(string value)
+        {
+            return PyString_FromString(value);
+        }
 
         internal static NewReference EmptyPyBytes()
         {
@@ -1456,6 +1460,8 @@ namespace Python.Runtime
 
         internal static int PyList_Append(BorrowedReference pointer, BorrowedReference value) => Delegates.PyList_Append(pointer, value);
 
+        public static int Public_PyList_Append(BorrowedReference pointer, BorrowedReference value) => Delegates.PyList_Append(pointer, value);
+
 
         internal static int PyList_Reverse(BorrowedReference pointer) => Delegates.PyList_Reverse(pointer);
 
@@ -1586,6 +1592,11 @@ namespace Python.Runtime
         {
             using var namePtr = new StrPtr(name, Encoding.UTF8);
             return Delegates.PySys_GetObject(namePtr);
+        }
+
+        public static BorrowedReference Public_PySys_GetObject(string name)
+        {
+            return PySys_GetObject(name);
         }
 
         internal static int PySys_SetObject(string name, BorrowedReference ob)

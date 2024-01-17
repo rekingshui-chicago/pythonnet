@@ -9,8 +9,7 @@ namespace Python.Runtime
     /// Should only be used for the arguments of Python C API functions, that steal references,
     /// and internal <see cref="PyObject"/> constructors.
     /// </summary>
-    [NonCopyable]
-    readonly ref struct StolenReference
+    public readonly ref struct StolenReference
     {
         internal readonly IntPtr Pointer;
 

@@ -1,0 +1,274 @@
+From 6ceb0204bd4dedad50804163851bdb39be270c26 Mon Sep 17 00:00:00 2001
+From: Reking Shui <yshui@smsassist.com>
+Date: Tue, 16 Jan 2024 16:55:11 -0600
+Subject: [PATCH] Added some new functions to public access.
+
+---
+ pythonnet.sln                                 | 40 +++++++++----------
+ src/console/Console.csproj                    |  6 +--
+ src/embed_tests/Python.EmbeddingTest.csproj   |  8 ++--
+ .../Python.PythonTestsRunner.csproj           |  1 -
+ src/runtime/Native/BorrowedReference.cs       |  2 +-
+ src/runtime/Native/NewReference.cs            |  8 ++--
+ src/runtime/Native/StolenReference.cs         |  3 +-
+ src/runtime/Runtime.cs                        | 11 +++++
+ src/runtime/Util/NullOnly.cs                  |  2 +-
+ .../Python.DomainReloadTests.csproj           |  4 --
+ 10 files changed, 44 insertions(+), 41 deletions(-)
+
+diff --git a/pythonnet.sln b/pythonnet.sln
+index d1a4789..288a39b 100644
+--- a/pythonnet.sln
++++ b/pythonnet.sln
+@@ -2,8 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
+ # Visual Studio Version 17
+ VisualStudioVersion = 17.0.31912.275
+ MinimumVisualStudioVersion = 15.0.26124.0
+-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Python.Runtime", "src\runtime\Python.Runtime.csproj", "{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}"
+-EndProject
+ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console", "src\console\Console.csproj", "{E6B01706-00BA-4144-9029-186AC42FBE9A}"
+ EndProject
+ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Python.EmbeddingTest", "src\embed_tests\Python.EmbeddingTest.csproj", "{819E089B-4770-400E-93C6-4F7A35F0EA12}"
+@@ -48,6 +46,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{142A6752
+ 		Directory.Build.props = Directory.Build.props
+ 	EndProjectSection
+ EndProject
++Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Python.Runtime", "src\runtime\Python.Runtime.csproj", "{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}"
++EndProject
+ Global
+ 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+ 		Debug|Any CPU = Debug|Any CPU
+@@ -61,24 +61,6 @@ Global
+ 		TraceAlloc|x86 = TraceAlloc|x86
+ 	EndGlobalSection
+ 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.Debug|x64.ActiveCfg = Debug|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.Debug|x64.Build.0 = Debug|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.Debug|x86.ActiveCfg = Debug|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.Debug|x86.Build.0 = Debug|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.Release|Any CPU.Build.0 = Release|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.Release|x64.ActiveCfg = Release|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.Release|x64.Build.0 = Release|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.Release|x86.ActiveCfg = Release|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.Release|x86.Build.0 = Release|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.TraceAlloc|Any CPU.ActiveCfg = TraceAlloc|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.TraceAlloc|Any CPU.Build.0 = TraceAlloc|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.TraceAlloc|x64.ActiveCfg = Debug|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.TraceAlloc|x64.Build.0 = Debug|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.TraceAlloc|x86.ActiveCfg = Debug|Any CPU
+-		{4E8C8FE2-0FB8-4517-B2D9-5FB2D5FC849B}.TraceAlloc|x86.Build.0 = Debug|Any CPU
+ 		{E6B01706-00BA-4144-9029-186AC42FBE9A}.Debug|Any CPU.ActiveCfg = Debug|x64
+ 		{E6B01706-00BA-4144-9029-186AC42FBE9A}.Debug|Any CPU.Build.0 = Debug|x64
+ 		{E6B01706-00BA-4144-9029-186AC42FBE9A}.Debug|x64.ActiveCfg = Debug|x64
+@@ -187,6 +169,24 @@ Global
+ 		{35CBBDEB-FC07-4D04-9D3E-F88FC180110B}.TraceAlloc|x64.Build.0 = Debug|Any CPU
+ 		{35CBBDEB-FC07-4D04-9D3E-F88FC180110B}.TraceAlloc|x86.ActiveCfg = Debug|Any CPU
+ 		{35CBBDEB-FC07-4D04-9D3E-F88FC180110B}.TraceAlloc|x86.Build.0 = Debug|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.Debug|Any CPU.Build.0 = Debug|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.Debug|x64.ActiveCfg = Debug|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.Debug|x64.Build.0 = Debug|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.Debug|x86.ActiveCfg = Debug|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.Debug|x86.Build.0 = Debug|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.Release|Any CPU.ActiveCfg = Release|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.Release|Any CPU.Build.0 = Release|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.Release|x64.ActiveCfg = Release|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.Release|x64.Build.0 = Release|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.Release|x86.ActiveCfg = Release|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.Release|x86.Build.0 = Release|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.TraceAlloc|Any CPU.ActiveCfg = TraceAlloc|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.TraceAlloc|Any CPU.Build.0 = TraceAlloc|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.TraceAlloc|x64.ActiveCfg = TraceAlloc|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.TraceAlloc|x64.Build.0 = TraceAlloc|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.TraceAlloc|x86.ActiveCfg = TraceAlloc|Any CPU
++		{AD74C4A5-ADF4-4B36-BE1E-FE90CBF14953}.TraceAlloc|x86.Build.0 = TraceAlloc|Any CPU
+ 	EndGlobalSection
+ 	GlobalSection(SolutionProperties) = preSolution
+ 		HideSolutionNode = FALSE
+diff --git a/src/console/Console.csproj b/src/console/Console.csproj
+index bcbc129..b224295 100644
+--- a/src/console/Console.csproj
++++ b/src/console/Console.csproj
+@@ -15,13 +15,13 @@
+       <LogicalName>Python.Runtime.dll</LogicalName>
+     </EmbeddedResource>
+   </ItemGroup>
+-  <ItemGroup>
+-    <ProjectReference Include="..\runtime\Python.Runtime.csproj" />
+-  </ItemGroup>
+   <ItemGroup>
+     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
+       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+       <PrivateAssets>all</PrivateAssets>
+     </PackageReference>
+   </ItemGroup>
++  <ItemGroup>
++    <ProjectReference Include="..\runtime\Python.Runtime.csproj" />
++  </ItemGroup>
+ </Project>
+diff --git a/src/embed_tests/Python.EmbeddingTest.csproj b/src/embed_tests/Python.EmbeddingTest.csproj
+index 4993994..2588552 100644
+--- a/src/embed_tests/Python.EmbeddingTest.csproj
++++ b/src/embed_tests/Python.EmbeddingTest.csproj
+@@ -6,10 +6,6 @@
+     <SignAssembly>true</SignAssembly>
+   </PropertyGroup>
+ 
+-  <ItemGroup>
+-    <ProjectReference Include="..\runtime\Python.Runtime.csproj" />
+-  </ItemGroup>
+-
+   <ItemGroup>
+     <None Include="fixtures/**/*.py" CopyToOutputDirectory="PreserveNewest" />
+   </ItemGroup>
+@@ -32,4 +28,8 @@
+     </PackageReference>
+   </ItemGroup>
+ 
++  <ItemGroup>
++    <ProjectReference Include="..\runtime\Python.Runtime.csproj" />
++  </ItemGroup>
++
+ </Project>
+diff --git a/src/python_tests_runner/Python.PythonTestsRunner.csproj b/src/python_tests_runner/Python.PythonTestsRunner.csproj
+index 63981c4..f3ac9ea 100644
+--- a/src/python_tests_runner/Python.PythonTestsRunner.csproj
++++ b/src/python_tests_runner/Python.PythonTestsRunner.csproj
+@@ -5,7 +5,6 @@
+   </PropertyGroup>
+ 
+   <ItemGroup>
+-    <ProjectReference Include="..\runtime\Python.Runtime.csproj" />
+     <ProjectReference Include="..\testing\Python.Test.csproj" />
+   </ItemGroup>
+ 
+diff --git a/src/runtime/Native/BorrowedReference.cs b/src/runtime/Native/BorrowedReference.cs
+index fd1059a..c893a2b 100644
+--- a/src/runtime/Native/BorrowedReference.cs
++++ b/src/runtime/Native/BorrowedReference.cs
+@@ -7,7 +7,7 @@ namespace Python.Runtime
+     /// Represents a reference to a Python object, that is being lent, and
+     /// can only be safely used until execution returns to the caller.
+     /// </summary>
+-    readonly ref struct BorrowedReference
++    public readonly ref struct BorrowedReference
+     {
+         readonly IntPtr pointer;
+         public bool IsNull => this.pointer == IntPtr.Zero;
+diff --git a/src/runtime/Native/NewReference.cs b/src/runtime/Native/NewReference.cs
+index f7a0308..c2e45bf 100644
+--- a/src/runtime/Native/NewReference.cs
++++ b/src/runtime/Native/NewReference.cs
+@@ -8,8 +8,7 @@ namespace Python.Runtime
+     /// <summary>
+     /// Represents a reference to a Python object, that is tracked by Python's reference counting.
+     /// </summary>
+-    [NonCopyable]
+-    ref struct NewReference
++    public ref struct NewReference
+     {
+         IntPtr pointer;
+ 
+@@ -142,7 +141,7 @@ namespace Python.Runtime
+     /// because <c>this</c> is always passed by value, which we need to avoid.
+     /// (note <code>this in NewReference</code> vs the usual <code>this NewReference</code>)
+     /// </summary>
+-    static class NewReferenceExtensions
++    public static class NewReferenceExtensions
+     {
+         /// <summary>Gets a raw pointer to the Python object</summary>
+         [Pure]
+@@ -153,8 +152,7 @@ namespace Python.Runtime
+         [DebuggerHidden]
+         public static bool IsNull(this in NewReference reference)
+             => NewReference.IsNull(reference);
+-
+-
++    
+         [Pure]
+         [DebuggerHidden]
+         public static BorrowedReference BorrowNullable(this in NewReference reference)
+diff --git a/src/runtime/Native/StolenReference.cs b/src/runtime/Native/StolenReference.cs
+index 49304c1..7bf739c 100644
+--- a/src/runtime/Native/StolenReference.cs
++++ b/src/runtime/Native/StolenReference.cs
+@@ -9,8 +9,7 @@ namespace Python.Runtime
+     /// Should only be used for the arguments of Python C API functions, that steal references,
+     /// and internal <see cref="PyObject"/> constructors.
+     /// </summary>
+-    [NonCopyable]
+-    readonly ref struct StolenReference
++    public readonly ref struct StolenReference
+     {
+         internal readonly IntPtr Pointer;
+ 
+diff --git a/src/runtime/Runtime.cs b/src/runtime/Runtime.cs
+index 4e1c615..5594d84 100644
+--- a/src/runtime/Runtime.cs
++++ b/src/runtime/Runtime.cs
+@@ -1261,6 +1261,10 @@ namespace Python.Runtime
+                 );
+         }
+ 
++        public static NewReference Public_PyString_FromString(string value)
++        {
++            return PyString_FromString(value);
++        }
+ 
+         internal static NewReference EmptyPyBytes()
+         {
+@@ -1456,6 +1460,8 @@ namespace Python.Runtime
+ 
+         internal static int PyList_Append(BorrowedReference pointer, BorrowedReference value) => Delegates.PyList_Append(pointer, value);
+ 
++        public static int Public_PyList_Append(BorrowedReference pointer, BorrowedReference value) => Delegates.PyList_Append(pointer, value);
++
+ 
+         internal static int PyList_Reverse(BorrowedReference pointer) => Delegates.PyList_Reverse(pointer);
+ 
+@@ -1588,6 +1594,11 @@ namespace Python.Runtime
+             return Delegates.PySys_GetObject(namePtr);
+         }
+ 
++        public static BorrowedReference Public_PySys_GetObject(string name)
++        {
++            return PySys_GetObject(name);
++        }
++
+         internal static int PySys_SetObject(string name, BorrowedReference ob)
+         {
+             using var namePtr = new StrPtr(name, Encoding.UTF8);
+diff --git a/src/runtime/Util/NullOnly.cs b/src/runtime/Util/NullOnly.cs
+index 763fb4e..113399c 100644
+--- a/src/runtime/Util/NullOnly.cs
++++ b/src/runtime/Util/NullOnly.cs
+@@ -5,7 +5,7 @@ namespace Python.Runtime
+     /// <para>Useful for overloading operators on structs,
+     /// that have meaningful concept of <c>null</c> value (e.g. pointers and references).</para>
+     /// </summary>
+-    class NullOnly : PyObject
++    public class NullOnly : PyObject
+     {
+         private NullOnly() : base(BorrowedReference.Null) { }
+     }
+diff --git a/tests/domain_tests/Python.DomainReloadTests.csproj b/tests/domain_tests/Python.DomainReloadTests.csproj
+index 9cb61c6..a62ead2 100644
+--- a/tests/domain_tests/Python.DomainReloadTests.csproj
++++ b/tests/domain_tests/Python.DomainReloadTests.csproj
+@@ -14,10 +14,6 @@
+     <Reference Include="System.Data" />
+     <Reference Include="System.Xml" />
+   </ItemGroup>
+-  
+-  <ItemGroup>
+-    <ProjectReference Include="..\..\src\runtime\Python.Runtime.csproj" />
+-  </ItemGroup>
+ 
+   <ItemGroup>
+     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" />
+-- 
+2.40.0.windows.1
+
